@@ -30,5 +30,7 @@ public class ClientHandler extends Thread {
                 username = in.readLine();
             }
 
-public class ClientHandler {
-}
+            synchronized (clients) {
+                clients.put(username, this);
+            }
+            System.out.println(username + " bağlandı.");
