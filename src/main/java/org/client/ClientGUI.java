@@ -148,3 +148,18 @@ public class ClientGUI {
                 messageLabel = new JLabel("<html><p style='padding:5px;'><b>" + sender + ":</b> " + content + "</p></html>");
                 messageLabel.setBackground(Color.LIGHT_GRAY);
             }
+
+            messageLabel.setOpaque(true);
+            messageLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            // Mesajı panel içine ekle
+            userPanel.add(messageLabel);
+            chatPanel.revalidate();
+            chatPanel.repaint();
+        });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(ClientGUI::new);
+    }
+}
