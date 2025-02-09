@@ -34,3 +34,45 @@ public class ClientHandler extends Thread {
                 clients.put(username, this);
             }
             System.out.println(username + " bağlandı.");
+
+            // Kullanıcıya giriş başarılı mesajını gönder
+            out.println("✅ Giriş başarılı! Artık mesaj gönderebilirsiniz.");
+
+            String message;
+            while ((message = in.readLine()) != null) {
+                System.out.println(username + " mesaj gönderdi: " + message);
+                String[] parts = message.split(":", 2);
+                if (parts.length == 2) {
+                    String recipient = parts[0].trim();
+                    String msg = parts[1].trim();
+                    sendMessage(recipient, username + ": " + msg);
+                } else {
+                    out.println("⚠ Hatalı format! Mesajınızı '<alıcı>: <mesaj>' şeklinde yazmalısınız.");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            synchronized (clients) {
+                clients.remove(username);
+            }
+            System.out.println(username + " ayrıldı.");
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void sendMessage(String recipient, String message) {
+        synchronized (clients) {
+            ClientHandler recipientHandler = clients.get(recipient);
+            if (recipientHandler != null) {
+                recipientHandler.out.println(message);
+            } else {
+                out.println("⚠ Kullanıcı bulunamadı: " + recipient);
+            }
+        }
+    }
+}
