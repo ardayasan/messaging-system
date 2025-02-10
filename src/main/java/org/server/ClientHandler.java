@@ -75,7 +75,7 @@ public class ClientHandler extends Thread {
                     String msg = parts[1].trim();
                     sendMessage(recipient, username + ": " + msg);
                 } else {
-                    out.println("Hatalı format! Mesajınızı '<alıcı>: <mesaj>' şeklinde yazmalısınız.");
+                    out.println("Format hatası!");
                 }
             }
         } catch (IOException e) {
