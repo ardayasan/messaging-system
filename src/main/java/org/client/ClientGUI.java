@@ -68,8 +68,8 @@ public class ClientGUI {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                disconnectFromServer();  // Sunucudan bağlantıyı kes
-                System.exit(0);  // Uygulamayı kapat
+                disconnectFromServer();
+                System.exit(0);
             }
         });
 
