@@ -17,7 +17,6 @@ import java.net.SocketException;
 
 public class ClientGUI {
     private Socket socket;
-
     private static final int PORT = 1234;
     private static final String IP = "127.0.0.1";
     private JFrame frame;
@@ -30,14 +29,11 @@ public class ClientGUI {
     private String username;
     private Map<String, JPanel> userMessagePanels;
 
-
-
     public ClientGUI() {
         frame = new JFrame("Messaging System");
         frame.setSize(400, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
-
 
         // Mesajları içeren panel
         chatPanel = new JPanel();
@@ -105,7 +101,7 @@ public class ClientGUI {
         return userMessagePanels;
     }
 
-    public void connectToServer() {
+    private void connectToServer() {
         try {
             socket = new Socket(IP, PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -149,7 +145,7 @@ public class ClientGUI {
         }
     }
 
-    public void disconnectFromServer() {
+    private void disconnectFromServer() {
         try {
             if (out != null) {
                 out.close();
@@ -166,7 +162,7 @@ public class ClientGUI {
         }
     }
 
-    public void sendMessage() {
+    private void sendMessage() {
         String recipient = recipientField.getText().trim();
         String message = messageField.getText().trim();
 
@@ -186,7 +182,7 @@ public class ClientGUI {
         }
     }
 
-    public void displayMessage(String message) {
+    private void displayMessage(String message) {
         SwingUtilities.invokeLater(() -> {
             System.out.println("Gelen Mesaj: " + message);
 
@@ -218,7 +214,8 @@ public class ClientGUI {
 
             String[] senderRecipientParts = senderAndRecipient.split(" -> ");
             String sender = senderRecipientParts[0]; // Gönderen
-            String recipient = (senderRecipientParts.length > 1) ? senderRecipientParts[1] : "Bilinmeyen"; // Alıcı
+            String recipient = (senderRecipientParts.length > 1) ?
+                    senderRecipientParts[1] : "Bilinmeyen"; // Alıcı
 
             // Eğer mesaj bana geldiyse, gönderene göre grupla
             String targetUser = sender.equals(username) ? recipient : sender;
@@ -227,7 +224,7 @@ public class ClientGUI {
             if (!userMessagePanels.containsKey(targetUser)) {
                 JPanel userPanel = new JPanel();
                 userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
-                userPanel.setBorder(BorderFactory.createTitledBorder(targetUser)); // Başlık ekle
+                userPanel.setBorder(BorderFactory.createTitledBorder(targetUser));
                 userMessagePanels.put(targetUser, userPanel);
                 chatPanel.add(userPanel);
             }

@@ -54,15 +54,17 @@ public class ClientHandler extends Thread {
 
             username = in.readLine(); // Kullanıcı adını sadece bir kez istiyorum
 
-            // Eğer boşsa veya geçersizse tekrar istemesin
+
             while (username == null || username.trim().isEmpty() || clients.containsKey(username)) {
-                out.println("Kullanıcı adı boş olamaz veya zaten kullanımda! Lütfen başka bir kullanıcı adı girin:");
+                out.println("Kullanıcı adı boş olamaz veya zaten kullanımda! " +
+                        "Lütfen başka bir kullanıcı adı girin:");
                 username = in.readLine();
             }
 
             synchronized (clients) {
                 clients.put(username, this);
             }
+
             System.out.println(username + " bağlandı.");
             String message;
             while ((message = in.readLine()) != null) {
@@ -104,5 +106,4 @@ public class ClientHandler extends Thread {
             recipientHandler.out.println(message);
         }
     }
-
 }
