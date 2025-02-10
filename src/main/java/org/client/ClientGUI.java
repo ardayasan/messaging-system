@@ -11,8 +11,15 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
+import java.net.SocketException;
 
 public class ClientGUI {
+    private Socket socket;
+
+    private static final int PORT = 1234;
+    private static final String IP = "127.0.0.1";
     private JFrame frame;
     private JTextField messageField;
     private JTextField recipientField;
@@ -21,16 +28,18 @@ public class ClientGUI {
     private PrintWriter out;
     private BufferedReader in;
     private String username;
-    private Map<String, JPanel> userMessagePanels; // Kullanıcı bazlı mesaj panelleri
+    private Map<String, JPanel> userMessagePanels;
+
+
 
     public ClientGUI() {
-        frame = new JFrame("Mesajlaşma Uygulaması");
+        frame = new JFrame("Messaging System");
         frame.setSize(400, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
 
-        // 📜 Mesajları içeren dinamik panel
+        // Mesajları içeren panel
         chatPanel = new JPanel();
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
         userMessagePanels = new HashMap<>();
@@ -60,28 +69,75 @@ public class ClientGUI {
             }
         });
 
-        frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                disconnectFromServer();  // Sunucudan bağlantıyı kes
+                System.exit(0);  // Uygulamayı kapat
+            }
+        });
 
+        frame.setVisible(true);
         connectToServer();
     }
 
-    private void connectToServer() {
+    public void setUsername(String username){
+        this.username = username;
+    }
+
+    public void setPrintWriter(PrintWriter out) {
+        this.out = out;
+    }
+
+    public void setBufferedReader(BufferedReader in) {
+        this.in = in;
+    }
+
+    public JTextField getRecipientField() {
+        return recipientField;
+    }
+
+    public JTextField getMessageField() {
+        return messageField;
+    }
+
+    public Map<String, JPanel> getUserMessagePanels() {
+        return userMessagePanels;
+    }
+
+    public void connectToServer() {
         try {
-            Socket socket = new Socket("localhost", 12345);
+            socket = new Socket(IP, PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            // Kullanıcı adı giriş ekranı
             username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
+
+            if (username == null) {
+                System.exit(0);
+            }
+
+            while (username.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Kullanıcı adı boş olamaz. " +
+                        "Lütfen geçerli bir kullanıcı adı girin.", "Hata", JOptionPane.ERROR_MESSAGE);
+
+                username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
+                if (username == null) {
+                    System.exit(0);
+                }
+            }
+
+            System.out.printf("Kullanıcı adı: %s\n", username);
             out.println(username);
 
-            // Gelen mesajları dinleyen thread
             Thread readerThread = new Thread(() -> {
                 try {
                     String serverResponse;
                     while ((serverResponse = in.readLine()) != null) {
                         displayMessage(serverResponse);
                     }
+                } catch (SocketException e) {
+                    System.out.println("Socket kapalı, okuma işlemi sonlandırılıyor.");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -93,7 +149,24 @@ public class ClientGUI {
         }
     }
 
-    private void sendMessage() {
+    public void disconnectFromServer() {
+        try {
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+            System.out.println("Bağlantı kapatıldı.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessage() {
         String recipient = recipientField.getText().trim();
         String message = messageField.getText().trim();
 
@@ -105,6 +178,7 @@ public class ClientGUI {
             }
 
             out.println(recipient + ": " + message);
+            // kendi attığım mesajı görmem gerek
             displayMessage(username + " -> " + recipient + ": " + message);  // Gönderdiğimiz mesajı da ekrana yaz
             messageField.setText("");
         } else {
@@ -112,14 +186,35 @@ public class ClientGUI {
         }
     }
 
-    private void displayMessage(String message) {
+    public void displayMessage(String message) {
         SwingUtilities.invokeLater(() -> {
-            // Mesaj formatı: "Gönderen -> Alıcı: Mesaj İçeriği"
+            System.out.println("Gelen Mesaj: " + message);
+
+            // Eğer mesaj "404:" hatası içeriyorsa, bu durumda kullanıcıyı uyaracağız
+            if (message.startsWith("404:")) {
+                String[] parts = message.split(":", 2);
+                if (parts.length > 1) {
+                    String recipient = parts[1].trim();  // Alıcının adı
+                    System.out.println("Hata mesajı alındı: Kullanıcı bulunamadı. Alıcı: " + recipient);
+                    JOptionPane.showMessageDialog(frame, "Kullanıcı " + recipient + " bulunamadı", "Hata", JOptionPane.ERROR_MESSAGE);
+
+                    // Alıcı panelini sohbet kısmından kaldırdım
+                    removeRecipientPanel(recipient);
+
+                    return;  // Hata mesajı alındığında sohbet kısmında gösterme
+                }
+            }
+
+            // Diğer mesajları işlemeye devam ediyor
             String[] parts = message.split(": ", 2);
-            if (parts.length < 2) return; // Hatalı mesaj formatı
+            if (parts.length < 2) {
+                System.out.println("Hatalı format: " + message);
+                return;
+            }
 
             String senderAndRecipient = parts[0]; // "Gönderen -> Alıcı"
             String content = parts[1]; // Mesaj içeriği
+
 
             String[] senderRecipientParts = senderAndRecipient.split(" -> ");
             String sender = senderRecipientParts[0]; // Gönderen
@@ -128,7 +223,7 @@ public class ClientGUI {
             // Eğer mesaj bana geldiyse, gönderene göre grupla
             String targetUser = sender.equals(username) ? recipient : sender;
 
-            // Hedef kullanıcı için panel var mı?
+            // Hedef kullanıcı için panel var mı kontrol et
             if (!userMessagePanels.containsKey(targetUser)) {
                 JPanel userPanel = new JPanel();
                 userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
@@ -139,10 +234,9 @@ public class ClientGUI {
 
             JPanel userPanel = userMessagePanels.get(targetUser);
 
-            // Mesaj baloncuğu oluştur
             JLabel messageLabel;
             if (sender.equals(username)) {
-                messageLabel = new JLabel("<html><p style='padding:5px;'><b>Ben:</b> " + content + "</p></html>");
+                messageLabel = new JLabel("<html><p style='padding:5px;'><b>Me:</b> " + content + "</p></html>");
                 messageLabel.setBackground(Color.GREEN);
             } else {
                 messageLabel = new JLabel("<html><p style='padding:5px;'><b>" + sender + ":</b> " + content + "</p></html>");
@@ -152,11 +246,20 @@ public class ClientGUI {
             messageLabel.setOpaque(true);
             messageLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            // Mesajı panel içine ekle
             userPanel.add(messageLabel);
             chatPanel.revalidate();
             chatPanel.repaint();
         });
+    }
+
+    private void removeRecipientPanel(String recipient) {
+        JPanel userPanel = userMessagePanels.get(recipient);
+        if (userPanel != null) {
+            chatPanel.remove(userPanel);
+            userMessagePanels.remove(recipient);
+            chatPanel.revalidate();
+            chatPanel.repaint();
+        }
     }
 
     public static void main(String[] args) {
