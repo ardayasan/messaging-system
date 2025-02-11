@@ -1,4 +1,4 @@
-package org.client;
+package org.yasanarda.client;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,30 +75,6 @@ public class ClientGUI {
 
         frame.setVisible(true);
         connectToServer();
-    }
-
-    public void setUsername(String username){
-        this.username = username;
-    }
-
-    public void setPrintWriter(PrintWriter out) {
-        this.out = out;
-    }
-
-    public void setBufferedReader(BufferedReader in) {
-        this.in = in;
-    }
-
-    public JTextField getRecipientField() {
-        return recipientField;
-    }
-
-    public JTextField getMessageField() {
-        return messageField;
-    }
-
-    public Map<String, JPanel> getUserMessagePanels() {
-        return userMessagePanels;
     }
 
     private void connectToServer() {
