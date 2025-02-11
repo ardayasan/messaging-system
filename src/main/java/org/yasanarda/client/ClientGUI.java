@@ -17,7 +17,7 @@ import java.net.SocketException;
 
 public class ClientGUI {
     private Socket socket;
-    private static final int PORT = 1234;
+    private static final int PORT = 12345;
     private static final String IP = "127.0.0.1";
     private JFrame frame;
     private JTextField messageField;
@@ -85,18 +85,12 @@ public class ClientGUI {
 
             username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
 
-            if (username == null) {
-                System.exit(0);
-            }
 
-            while (username.trim().isEmpty()) {
+            // WILL BE FIXED
+            if (username == null || username.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(frame, "Kullanıcı adı boş olamaz. " +
                         "Lütfen geçerli bir kullanıcı adı girin.", "Hata", JOptionPane.ERROR_MESSAGE);
-
-                username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
-                if (username == null) {
-                    System.exit(0);
-                }
+                return;
             }
 
             System.out.printf("Kullanıcı adı: %s\n", username);
