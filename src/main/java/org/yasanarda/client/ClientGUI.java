@@ -148,7 +148,7 @@ public class ClientGUI {
             displayMessage(username + " -> " + recipient + ": " + message);
             messageField.setText("");
         } else {
-            JOptionPane.showMessageDialog(frame, "Username or message can't be empty.", "Error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Username or message field can't be empty.", "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -159,7 +159,7 @@ public class ClientGUI {
             if (message.startsWith("404:")) {
                 String[] parts = message.split(":", 2);
                 if (parts.length > 1) {
-                    String recipient = parts[1].trim();  // Alıcının adı
+                    String recipient = parts[1].trim();  // Receiver name
                     System.out.println("Error: user couldn't found. Receiver: " + recipient);
                     JOptionPane.showMessageDialog(frame, "User " + recipient + " couldn't found", "Error", JOptionPane.ERROR_MESSAGE);
 

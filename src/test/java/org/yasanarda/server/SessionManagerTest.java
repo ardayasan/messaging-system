@@ -34,7 +34,7 @@ public class SessionManagerTest {
         when(mockSocket.getOutputStream()).thenReturn(mockOutputStream);
 
         sessionManager = new SessionManager("testUser", mockSocket);
-        sessionManager = spy(sessionManager); // To spy on the instance methods
+        sessionManager = spy(sessionManager);
 
         doReturn(mockConnectionManager).when(sessionManager).getConnectionManager();
     }
