@@ -12,10 +12,17 @@ public class Server {
     private ServerSocket serverSocket;
     private boolean isRunning;
 
-    public Server(){/* */}
+    public Server(){
+        isRunning = false;
+    }
 
     public Server(int port){
         PORT = port;
+        isRunning = false;
+    }
+
+    public static Map<String, SessionManager> getClients(){
+        return Server.clients;
     }
 
     public void startServer() throws IOException {
@@ -28,25 +35,20 @@ public class Server {
             try {
                 Socket socket = serverSocket.accept();
                 String username = new ConnectionManager(socket).getReader().readLine();
-                if (username != null && !username.trim().isEmpty() && !clients.containsKey(username)) {
-                    // Create a SessionManager for this username and socket
+                if (username != null && !username.trim().isEmpty() && !Server.clients.containsKey(username)) {
                     SessionManager sessionManager = new SessionManager(username, socket);
-
-                    // Create the ClientHandler and pass the SessionManager
-                    ClientHandler clientHandler = new ClientHandler(username, socket, clients);
-
-                    // Store the session manager in the clients map
-                    clients.put(username, sessionManager);
-
-                    // Start the ClientHandler thread
+                    ClientHandler clientHandler = new ClientHandler(username, socket, Server.clients);
+                    Server.clients.put(username, sessionManager);
                     clientHandler.start();
+                } else{
+                    socket.close();
                 }
             } catch (IOException e) {
                 if (isRunning) {
                     System.out.println("Bir hata oluştu: " + e.getMessage());
+                    // GUI daki problem serverı kapatıyor.
                     e.printStackTrace();
                 } else {
-                    // Server düzgün bir şekilde kapatıldı, accept()'in çıkması
                     System.out.println("Server durdu.");
                 }
             }

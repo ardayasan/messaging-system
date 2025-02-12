@@ -13,12 +13,10 @@ public class MessageHandler {
         synchronized (clients) {
             SessionManager recipientSession = clients.get(recipient);
             if (recipientSession == null) {
-                // Alıcı bulunamadı, hata mesajı gönder
                 SessionManager senderSession = clients.get(sender);
                 senderSession.getConnectionManager().getWriter().println("404:" + recipient);
                 return;
             }
-            // Alıcıya mesajı gönder
             recipientSession.getConnectionManager().getWriter().println(sender + ": " + message);
         }
     }

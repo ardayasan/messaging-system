@@ -83,16 +83,21 @@ public class ClientGUI {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
+            
+            // Kullanıcı adı geçerli olana kadar tekrar sorulacak
+            while (username == null || username.trim().isEmpty()) {
+                username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
 
-
-            // WILL BE FIXED
-            if (username == null || username.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Kullanıcı adı boş olamaz. " +
-                        "Lütfen geçerli bir kullanıcı adı girin.", "Hata", JOptionPane.ERROR_MESSAGE);
-                return;
+                if (username == null) {
+                    // Kullanıcı pencereyi kapattıysa uygulamayı sonlandırıyoruz
+                    System.exit(0);
+                } else if (username.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Kullanıcı adı boş olamaz. Lütfen geçerli bir kullanıcı adı girin.",
+                            "Hata", JOptionPane.ERROR_MESSAGE);
+                }
             }
 
+            // Kullanıcı adı geçerli ise bağlantı kuruluyor
             System.out.printf("Kullanıcı adı: %s\n", username);
             out.println(username);
 
