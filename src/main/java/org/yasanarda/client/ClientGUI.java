@@ -17,7 +17,7 @@ import java.net.SocketException;
 
 public class ClientGUI {
     private Socket socket;
-    private static final int PORT = 12345;
+    private static final int PORT = 1234;
     private static final String IP = "127.0.0.1";
     private JFrame frame;
     private JTextField messageField;
@@ -35,7 +35,7 @@ public class ClientGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        // Mesajları içeren panel
+        // Message panel
         chatPanel = new JPanel();
         chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
         userMessagePanels = new HashMap<>();
@@ -43,17 +43,17 @@ public class ClientGUI {
         scrollPane = new JScrollPane(chatPanel);
         frame.add(scrollPane, BorderLayout.CENTER);
 
-        // Alıcı kullanıcı adı girme alanı
-        recipientField = new JTextField("Alıcı Adı");
+        // Username field
+        recipientField = new JTextField("Receiver Name");
         recipientField.setPreferredSize(new Dimension(100, 30));
 
-        // Mesaj gönderme alanı
+        // Message send field
         JPanel bottomPanel = new JPanel(new BorderLayout());
         messageField = new JTextField();
         bottomPanel.add(recipientField, BorderLayout.WEST);
         bottomPanel.add(messageField, BorderLayout.CENTER);
 
-        JButton sendButton = new JButton("Gönder");
+        JButton sendButton = new JButton("Send");
         bottomPanel.add(sendButton, BorderLayout.EAST);
 
         frame.add(bottomPanel, BorderLayout.SOUTH);
@@ -83,22 +83,19 @@ public class ClientGUI {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            
-            // Kullanıcı adı geçerli olana kadar tekrar sorulacak
+
             while (username == null || username.trim().isEmpty()) {
-                username = JOptionPane.showInputDialog(frame, "Kullanıcı adınızı girin:");
+                username = JOptionPane.showInputDialog(frame, " Enter username:");
 
                 if (username == null) {
-                    // Kullanıcı pencereyi kapattıysa uygulamayı sonlandırıyoruz
                     System.exit(0);
                 } else if (username.trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Kullanıcı adı boş olamaz. Lütfen geçerli bir kullanıcı adı girin.",
-                            "Hata", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Username can't be empty. Please enter a valid username.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
-            // Kullanıcı adı geçerli ise bağlantı kuruluyor
-            System.out.printf("Kullanıcı adı: %s\n", username);
+            System.out.printf("Username: %s\n", username);
             out.println(username);
 
             Thread readerThread = new Thread(() -> {
@@ -108,7 +105,7 @@ public class ClientGUI {
                         displayMessage(serverResponse);
                     }
                 } catch (SocketException e) {
-                    System.out.println("Socket kapalı, okuma işlemi sonlandırılıyor.");
+                    System.out.println("Socket closed.");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -116,7 +113,7 @@ public class ClientGUI {
             readerThread.start();
 
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Sunucuya bağlanılamadı!", "Hata", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Server connection error!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -131,7 +128,7 @@ public class ClientGUI {
             if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
-            System.out.println("Bağlantı kapatıldı.");
+            System.out.println("Connection closed.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -142,60 +139,57 @@ public class ClientGUI {
         String message = messageField.getText().trim();
 
         if (!recipient.isEmpty() && !message.isEmpty()) {
-            // Kullanıcı kendi kendine mesaj gönderemez
             if (recipient.equals(username)) {
-                JOptionPane.showMessageDialog(frame, "Kendinize mesaj gönderemezsiniz!", "Hata", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "You can't send message to yourself!", "Error", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             out.println(recipient + ": " + message);
-            // kendi attığım mesajı görmem gerek
-            displayMessage(username + " -> " + recipient + ": " + message);  // Gönderdiğimiz mesajı da ekrana yaz
+            displayMessage(username + " -> " + recipient + ": " + message);
             messageField.setText("");
         } else {
-            JOptionPane.showMessageDialog(frame, "Alıcı ve mesaj boş olamaz!", "Hata", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Username or message can't be empty.", "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
 
     private void displayMessage(String message) {
         SwingUtilities.invokeLater(() -> {
-            System.out.println("Gelen Mesaj: " + message);
+            System.out.println("Received Message: " + message);
 
-            // Eğer mesaj "404:" hatası içeriyorsa, bu durumda kullanıcıyı uyaracağız
             if (message.startsWith("404:")) {
                 String[] parts = message.split(":", 2);
                 if (parts.length > 1) {
                     String recipient = parts[1].trim();  // Alıcının adı
-                    System.out.println("Hata mesajı alındı: Kullanıcı bulunamadı. Alıcı: " + recipient);
-                    JOptionPane.showMessageDialog(frame, "Kullanıcı " + recipient + " bulunamadı", "Hata", JOptionPane.ERROR_MESSAGE);
+                    System.out.println("Error: user couldn't found. Receiver: " + recipient);
+                    JOptionPane.showMessageDialog(frame, "User " + recipient + " couldn't found", "Error", JOptionPane.ERROR_MESSAGE);
 
-                    // Alıcı panelini sohbet kısmından kaldırdım
                     removeRecipientPanel(recipient);
-
-                    return;  // Hata mesajı alındığında sohbet kısmında gösterme
+                    return;
                 }
             }
 
-            // Diğer mesajları işlemeye devam ediyor
-            String[] parts = message.split(": ", 2);
-            if (parts.length < 2) {
-                System.out.println("Hatalı format: " + message);
+            if (message.startsWith("200")) {
+                frame.dispose();
                 return;
             }
 
-            String senderAndRecipient = parts[0]; // "Gönderen -> Alıcı"
-            String content = parts[1]; // Mesaj içeriği
+            String[] parts = message.split(": ", 2);
+            if (parts.length < 2) {
+                System.out.println("Format error: " + message);
+                return;
+            }
+
+            String senderAndRecipient = parts[0]; // "Sender -> Receiver" part
+            String content = parts[1]; // Message content part
 
 
             String[] senderRecipientParts = senderAndRecipient.split(" -> ");
-            String sender = senderRecipientParts[0]; // Gönderen
+            String sender = senderRecipientParts[0]; // Sender
             String recipient = (senderRecipientParts.length > 1) ?
-                    senderRecipientParts[1] : "Bilinmeyen"; // Alıcı
+                    senderRecipientParts[1] : "Unknown"; // Receiver
 
-            // Eğer mesaj bana geldiyse, gönderene göre grupla
             String targetUser = sender.equals(username) ? recipient : sender;
 
-            // Hedef kullanıcı için panel var mı kontrol et
             if (!userMessagePanels.containsKey(targetUser)) {
                 JPanel userPanel = new JPanel();
                 userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
@@ -232,9 +226,5 @@ public class ClientGUI {
             chatPanel.revalidate();
             chatPanel.repaint();
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(ClientGUI::new);
     }
 }
