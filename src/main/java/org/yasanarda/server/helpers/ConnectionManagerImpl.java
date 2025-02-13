@@ -7,7 +7,6 @@ public class ConnectionManagerImpl implements ConnectionManager {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-
     public ConnectionManagerImpl(Socket socket) throws IOException {
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

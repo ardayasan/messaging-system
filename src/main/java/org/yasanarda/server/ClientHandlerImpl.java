@@ -10,14 +10,12 @@ public class ClientHandlerImpl extends Thread implements ClientHandler {
     private SessionManager sessionManager;
     private Map<String, SessionManager> clients;
     private MessageHandler messageHandler;
-
     public ClientHandlerImpl(String username, Socket socket, Map<String, SessionManager> clients) throws IOException {
         this.username = username;
         this.clients = clients;
         this.sessionManager = new SessionManagerImpl(username, socket);
         this.messageHandler = new MessageHandlerImpl(clients);
     }
-
     @Override
     public void run() {
         try {

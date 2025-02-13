@@ -16,16 +16,13 @@ public class ServerImpl implements Server{
     private Map<String, SessionManager> clients = new HashMap<>();
     private ServerSocket serverSocket;
     private boolean isRunning;
-
     public ServerImpl(){
         isRunning = false;
     }
-
     public ServerImpl(int port){
         ServerImpl.PORT = port;
         this.isRunning = false;
     }
-
     @Override
     public void startServer() throws IOException {
         System.out.println("Server starting...");
@@ -59,7 +56,6 @@ public class ServerImpl implements Server{
             }
         }
     }
-
     @Override
     public void stopServer() {
         try {

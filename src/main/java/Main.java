@@ -6,12 +6,10 @@ import javax.swing.*;
 import java.io.IOException;
 
 public class Main {
-
     public static void main(String[] args) {
         startServerThread();
         startClientCreatorThread();
     }
-
     private static void startServerThread() {
         new Thread(() -> {
             Server server = new ServerImpl();
@@ -24,7 +22,6 @@ public class Main {
             }
         }).start();
     }
-
     private static void startClientCreatorThread() {
         new Thread(() -> {
             JFrame mainFrame = new JFrame("Main GUI");
