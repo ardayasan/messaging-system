@@ -28,7 +28,6 @@ public class ClientGUI {
     private BufferedReader in;
     private String username;
     private Map<String, JPanel> userMessagePanels;
-
     public ClientGUI() {
         frame = new JFrame("Messaging System");
         frame.setSize(400, 600);
@@ -76,7 +75,6 @@ public class ClientGUI {
         frame.setVisible(true);
         connectToServer();
     }
-
     private void connectToServer() {
         try {
             socket = new Socket(IP, PORT);
@@ -116,7 +114,6 @@ public class ClientGUI {
             JOptionPane.showMessageDialog(frame, "Server connection error!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
     private void disconnectFromServer() {
         try {
             if (out != null) {
@@ -133,7 +130,6 @@ public class ClientGUI {
             e.printStackTrace();
         }
     }
-
     private void sendMessage() {
         String recipient = recipientField.getText().trim();
         String message = messageField.getText().trim();
@@ -151,7 +147,6 @@ public class ClientGUI {
             JOptionPane.showMessageDialog(frame, "Username or message field can't be empty.", "Error", JOptionPane.WARNING_MESSAGE);
         }
     }
-
     private void displayMessage(String message) {
         SwingUtilities.invokeLater(() -> {
             System.out.println("Received Message: " + message);
@@ -217,7 +212,6 @@ public class ClientGUI {
             chatPanel.repaint();
         });
     }
-
     private void removeRecipientPanel(String recipient) {
         JPanel userPanel = userMessagePanels.get(recipient);
         if (userPanel != null) {

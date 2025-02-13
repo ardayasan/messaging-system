@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 
 public class ClientCreatorImpl implements ClientCreator {
     private JButton button;
-
     public ClientCreatorImpl() {
         button = new JButton("Create New Client GUI");
 
@@ -17,7 +16,6 @@ public class ClientCreatorImpl implements ClientCreator {
             }
         });
     }
-
     @Override
     public JButton getButton() {
         return button;
