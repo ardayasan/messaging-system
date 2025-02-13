@@ -1,4 +1,5 @@
 import org.yasanarda.client.ClientCreator;
+import org.yasanarda.client.ClientCreatorImpl;
 import org.yasanarda.server.Server;
 import org.yasanarda.server.ServerImpl;
 
@@ -28,7 +29,7 @@ public class Main {
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             mainFrame.setSize(400, 200);
 
-            ClientCreator clientCreator = new ClientCreator();
+            ClientCreator clientCreator = new ClientCreatorImpl();
             mainFrame.add(clientCreator.getButton());
             mainFrame.setVisible(true);
         }).start();
