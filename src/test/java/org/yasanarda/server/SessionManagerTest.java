@@ -3,6 +3,9 @@ package org.yasanarda.server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.yasanarda.server.helpers.ConnectionManager;
+import org.yasanarda.server.helpers.ConnectionManagerImpl;
+import org.yasanarda.server.helpers.SessionManagerImpl;
 
 import java.io.*;
 import java.net.Socket;
@@ -22,9 +25,9 @@ public class SessionManagerTest {
     private OutputStream mockOutputStream;
 
     @Mock
-    private ConnectionManager mockConnectionManager;
+    private ConnectionManagerImpl mockConnectionManager;
 
-    private SessionManager sessionManager;
+    private SessionManagerImpl sessionManager;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -33,7 +36,7 @@ public class SessionManagerTest {
         when(mockSocket.getInputStream()).thenReturn(mockInputStream);
         when(mockSocket.getOutputStream()).thenReturn(mockOutputStream);
 
-        sessionManager = new SessionManager("testUser", mockSocket);
+        sessionManager = new SessionManagerImpl("testUser", mockSocket);
         sessionManager = spy(sessionManager);
 
         doReturn(mockConnectionManager).when(sessionManager).getConnectionManager();
@@ -59,7 +62,7 @@ public class SessionManagerTest {
 
     @Test
     public void testConstructor() throws IOException {
-        SessionManager newSessionManager = new SessionManager("newUser", mockSocket);
+        SessionManagerImpl newSessionManager = new SessionManagerImpl("newUser", mockSocket);
         assertEquals("newUser", newSessionManager.getUsername(), "Username should be 'newUser'");
         assertNotNull(newSessionManager.getConnectionManager(), "ConnectionManager should not be null");
     }

@@ -1,25 +1,28 @@
-package org.yasanarda.server;
+package org.yasanarda.server.helpers;
 
 import java.io.IOException;
 import java.net.Socket;
 
-public class SessionManager {
+public class SessionManagerImpl implements SessionManager {
     private String username;
-    private ConnectionManager connectionManager;
+    private ConnectionManagerImpl connectionManager;
 
-    public SessionManager(String username, Socket socket) throws IOException {
+    public SessionManagerImpl(String username, Socket socket) throws IOException {
         this.username = username;
-        this.connectionManager = new ConnectionManager(socket);
+        this.connectionManager = new ConnectionManagerImpl(socket);
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
 
+    @Override
     public ConnectionManager getConnectionManager() {
         return connectionManager;
     }
 
+    @Override
     public void closeSession() {
         connectionManager.closeConnection();
     }

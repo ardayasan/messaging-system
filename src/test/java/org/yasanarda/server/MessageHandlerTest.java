@@ -3,6 +3,10 @@ package org.yasanarda.server;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.yasanarda.server.helpers.ConnectionManager;
+import org.yasanarda.server.helpers.MessageHandler;
+import org.yasanarda.server.helpers.MessageHandlerImpl;
+import org.yasanarda.server.helpers.SessionManager;
 
 import static org.mockito.Mockito.*;
 
@@ -38,7 +42,7 @@ public class MessageHandlerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        messageHandler = new MessageHandler(mockClients);
+        messageHandler = new MessageHandlerImpl(mockClients);
 
         when(mockSenderSession.getConnectionManager()).thenReturn(mockSenderConnectionManager);
         when(mockSenderConnectionManager.getWriter()).thenReturn(mockSenderWriter);

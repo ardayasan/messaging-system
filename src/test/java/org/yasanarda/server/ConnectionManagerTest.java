@@ -2,6 +2,7 @@ package org.yasanarda.server;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.yasanarda.server.helpers.ConnectionManagerImpl;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,7 +16,7 @@ public class ConnectionManagerTest {
     private PrintWriter mockPrintWriter;
     private InputStream mockInputStream;
     private OutputStream mockOutputStream;
-    private ConnectionManager connectionManager;
+    private ConnectionManagerImpl connectionManager;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -26,7 +27,7 @@ public class ConnectionManagerTest {
         mockPrintWriter = new PrintWriter(mockOutputStream);
         when(mockSocket.getInputStream()).thenReturn(mockInputStream);
         when(mockSocket.getOutputStream()).thenReturn(mockOutputStream);
-        connectionManager = new ConnectionManager(mockSocket);
+        connectionManager = new ConnectionManagerImpl(mockSocket);
     }
 
     @Test

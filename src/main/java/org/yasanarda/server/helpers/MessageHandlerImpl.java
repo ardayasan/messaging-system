@@ -1,14 +1,14 @@
-package org.yasanarda.server;
+package org.yasanarda.server.helpers;
 
 import java.util.Map;
 
-public class MessageHandler {
+public class MessageHandlerImpl implements MessageHandler {
     private Map<String, SessionManager> clients;
 
-    public MessageHandler(Map<String, SessionManager> clients) {
+    public MessageHandlerImpl(Map<String, SessionManager> clients) {
         this.clients = clients;
     }
-
+    @Override
     public void sendMessage(String sender, String recipient, String message) {
         synchronized (clients) {
             SessionManager recipientSession = clients.get(recipient);
