@@ -11,8 +11,8 @@ public class Main {
         startServerThread();
         startClientCreatorThread();
     }
-    
-    public static void startServerThread() {
+
+    private static void startServerThread() {
         new Thread(() -> {
             Server server = new ServerImpl();
             Runtime.getRuntime().addShutdownHook(new Thread(() -> server.stopServer()));
@@ -25,7 +25,7 @@ public class Main {
         }).start();
     }
 
-    public static void startClientCreatorThread() {
+    private static void startClientCreatorThread() {
         new Thread(() -> {
             JFrame mainFrame = new JFrame("Main GUI");
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
