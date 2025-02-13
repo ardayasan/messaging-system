@@ -23,7 +23,7 @@ public class ServerImpl implements Server{
 
     public ServerImpl(int port){
         ServerImpl.PORT = port;
-        isRunning = false;
+        this.isRunning = false;
     }
 
     @Override
@@ -39,14 +39,11 @@ public class ServerImpl implements Server{
                 String username = new ConnectionManagerImpl(socket).getReader().readLine();
 
                 if (username != null && !username.trim().isEmpty()) {
-                    // Check if username already exists
                     if (clients.containsKey(username)) {
-                        // Send a message indicating the username is taken
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                         out.println("200");
                         socket.close();
                     } else {
-                        // Proceed with the connection if username is unique
                         SessionManager sessionManager = new SessionManagerImpl(username, socket);
                         ClientHandler clientHandler = new ClientHandlerImpl(username, socket, clients);
                         clients.put(username, sessionManager);
@@ -71,7 +68,6 @@ public class ServerImpl implements Server{
                 serverSocket.close();
                 System.out.println("Server closed.");
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
