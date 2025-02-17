@@ -6,5 +6,5 @@ import java.io.PrintWriter;
 public interface ConnectionManager {
     public BufferedReader getReader();
     public PrintWriter getWriter();
-    public  void closeConnection();
+    public void closeConnection();
 }
